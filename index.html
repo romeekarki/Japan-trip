@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Japan Trip</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif;background:#f5f6f8;color:#111827}
+header{background:#111827;color:white;padding:54px 20px 24px;border-radius:0 0 28px 28px}
+h1{margin:0;font-size:32px}header p{margin:7px 0 0;color:#cbd5e1}.wrap{padding:18px;max-width:720px;margin:auto}
+.card{background:white;border-radius:20px;padding:18px;margin:12px 0;box-shadow:0 4px 18px #0000000d}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tile{background:white;border:0;border-radius:18px;padding:18px;text-align:left;font-size:16px;box-shadow:0 4px 18px #0000000d}.emoji{font-size:27px;display:block;margin-bottom:8px}
+h2{font-size:20px;margin:4px 0 12px}.stay{border-left:5px solid #111827;padding-left:14px;margin:16px 0}.stay b{font-size:17px}.muted{color:#64748b;font-size:14px;line-height:1.45}
+button{font:inherit}.add{width:100%;padding:13px;border:0;border-radius:13px;background:#111827;color:white;font-weight:600}.list{padding-left:20px}.item{margin:9px 0}.row{display:flex;gap:8px}.row input{flex:1;padding:12px;border:1px solid #dbe1e8;border-radius:12px;font-size:16px}
+.empty{color:#64748b;padding:8px 0}.danger{background:#fee2e2;color:#991b1b;border:0;border-radius:10px;padding:7px 10px}
+small{color:#94a3b8}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>🇯🇵 Japan Trip</h1><p>Your trip planner • add plans as you go</p></div></header>
+<main class="wrap">
+<div class="grid">
+<button class="tile" onclick="focusAdd()"><span class="emoji">🗓️</span><b>Itinerary</b><br><small>Add plans</small></button>
+<button class="tile" onclick="document.getElementById('packing').scrollIntoView()"><span class="emoji">🧳</span><b>Packing</b><br><small>Your checklist</small></button>
+<button class="tile" onclick="document.getElementById('bookings').scrollIntoView()"><span class="emoji">🎟️</span><b>Bookings</b><br><small>Tickets & notes</small></button>
+<button class="tile" onclick="document.getElementById('expenses').scrollIntoView()"><span class="emoji">💴</span><b>Expenses</b><br><small>Track spending</small></button>
+</div>
+
+<section class="card"><h2>🏨 Where you're staying</h2>
+<div class="stay"><b>Tokyo</b><p class="muted">Tokyo-to, Tokyo, Chiyoda-ku, Kanda Misakicho 2-22-17, Japan</p></div>
+<div class="stay"><b>Kyoto</b><p class="muted">Kyoto, Kyoto, Shimogyo-ku Higashihorikawa-dori Shiokoji-sagaru Taimatsu-cho 1, Japan</p></div>
+<div class="stay"><b>Osaka</b><p class="muted">Osaka Prefecture, Osaka, Chuo-ku Honmachi 4-5-…</p></div>
+</section>
+
+<section class="card" id="itinerary"><h2>🗓️ My Itinerary</h2>
+<div class="row"><input id="newPlan" placeholder="e.g. Shibuya, dinner, train…"><button class="add" style="width:auto" onclick="addPlan()">Add</button></div>
+<div id="plans" class="list"><p class="empty">No plans added yet. Build your itinerary as you travel.</p></div>
+</section>
+
+<section class="card" id="packing"><h2>🧳 Packing List</h2>
+<div class="row"><input id="newPack" placeholder="Add an item…"><button class="add" style="width:auto" onclick="addPack()">Add</button></div>
+<div id="packs" class="list"></div>
+</section>
+
+<section class="card" id="bookings"><h2>🎟️ Bookings & Tickets</h2>
+<div class="row"><input id="newBook" placeholder="Add booking or ticket…"><button class="add" style="width:auto" onclick="addBook()">Add</button></div>
+<div id="books" class="list"></div>
+</section>
+
+<section class="card" id="expenses"><h2>💴 Expenses</h2>
+<div class="row"><input id="expenseName" placeholder="What did you spend on?"><input id="expenseAmt" type="number" step="0.01" placeholder="¥"><button class="add" style="width:auto" onclick="addExpense()">Add</button></div>
+<div id="exps" class="list"></div><p><b>Total: ¥<span id="total">0</span></b></p>
+</section>
+
+<section class="card"><h2>📌 Important</h2><p class="muted">Keep passports, travel insurance, flight details and emergency information here. This app stores your added notes on this device.</p></section>
+</main>
+<script>
+const get=k=>JSON.parse(localStorage.getItem(k)||"[]"), set=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+function renderList(key,id){let a=get(key),el=document.getElementById(id);el.innerHTML=a.length?a.map((x,i)=>`<div class="item">• ${x} <button class="danger" onclick="del('${key}',${i})">×</button></div>`).join(""):'<p class="empty">Nothing added yet.</p>'}
+function del(k,i){let a=get(k);a.splice(i,1);set(k,a);render()}
+function addSimple(k,input){let v=document.getElementById(input).value.trim();if(!v)return;let a=get(k);a.push(v);set(k,a);document.getElementById(input).value="";render()}
+function addPlan(){addSimple("plans","newPlan")} function addPack(){addSimple("packs","newPack")} function addBook(){addSimple("books","newBook")}
+function addExpense(){let n=document.getElementById("expenseName").value.trim(),a=parseFloat(document.getElementById("expenseAmt").value);if(!n||isNaN(a))return;let x=get("expenses");x.push({n,a});set("expenses",x);document.getElementById("expenseName").value="";document.getElementById("expenseAmt").value="";render()}
+function render(){renderList("plans","plans");renderList("packs","packs");renderList("bookings","books");let x=get("expenses"),e=document.getElementById("exps");e.innerHTML=x.length?x.map((v,i)=>`<div class="item">• ${v.n} — ¥${v.a.toLocaleString()} <button class="danger" onclick="del('expenses',${i})">×</button></div>`).join(""):'<p class="empty">No expenses yet.</p>';document.getElementById("total").textContent=x.reduce((s,v)=>s+v.a,0).toLocaleString()}
+function focusAdd(){document.getElementById("itinerary").scrollIntoView();setTimeout(()=>document.getElementById("newPlan").focus(),400)}
+render();
+</script>
+</body></html>
